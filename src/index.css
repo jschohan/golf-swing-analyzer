@@ -248,3 +248,120 @@ body {
   font-variant-numeric: tabular-nums;
   color: var(--text-strong);
 }
+
+/* Annotation toolbar */
+
+.toolbar {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar .button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--text-strong);
+}
+
+.toolbar input[type='text'] {
+  font: inherit;
+  width: 160px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-strong);
+  background: var(--surface);
+}
+
+.toolbar input[type='text']:disabled {
+  opacity: 0.5;
+}
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 0 1px var(--border);
+}
+
+.swatch[aria-pressed='true'] {
+  box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}
+
+/* Overlay */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  user-select: none;
+}
+
+.overlay--line {
+  cursor: crosshair;
+}
+
+.overlay__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.overlay__stroke {
+  fill: none;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+/* Wide, invisible stroke so lines are easy to grab. */
+.overlay__hit {
+  fill: none;
+  stroke: transparent;
+  pointer-events: stroke;
+  cursor: move;
+}
+
+.overlay--line .overlay__hit {
+  pointer-events: none;
+}
+
+.overlay__handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: grab;
+}
+
+.overlay__label {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #000;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  pointer-events: none;
+}

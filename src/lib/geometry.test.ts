@@ -4,6 +4,7 @@ import {
   angleBetweenLines,
   angleFromHorizontal,
   angleFromVertical,
+  clampTranslation,
   lineIntersection,
 } from './geometry'
 
@@ -42,6 +43,24 @@ describe('lineIntersection', () => {
   })
   it('returns null for parallel lines', () => {
     expect(lineIntersection({ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 })).toBeNull()
+  })
+})
+
+describe('clampTranslation', () => {
+  const a = { x: 0.1, y: 0.1 }
+  const b = { x: 0.3, y: 0.5 }
+  it('passes through a translation that stays on screen', () => {
+    const t = clampTranslation(a, b, 0.1, -0.05)
+    expect(t.dx).toBeCloseTo(0.1)
+    expect(t.dy).toBeCloseTo(-0.05)
+  })
+  it('stops at the edges of the frame', () => {
+    const low = clampTranslation(a, b, -1, -1)
+    expect(low.dx).toBeCloseTo(-0.1)
+    expect(low.dy).toBeCloseTo(-0.1)
+    const high = clampTranslation(a, b, 1, 1)
+    expect(high.dx).toBeCloseTo(0.7)
+    expect(high.dy).toBeCloseTo(0.5)
   })
 })
 

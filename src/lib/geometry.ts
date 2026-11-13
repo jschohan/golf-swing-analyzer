@@ -51,6 +51,26 @@ export function lineIntersection(a1: Point, a2: Point, b1: Point, b2: Point): Po
   return { x: a1.x + t * d1x, y: a1.y + t * d1y }
 }
 
+/**
+ * Clamps a translation so both endpoints stay inside the unit square.
+ * Keeps a line's shape intact when it is dragged against an edge.
+ */
+export function clampTranslation(
+  a: Point,
+  b: Point,
+  dx: number,
+  dy: number,
+): { dx: number; dy: number } {
+  const minX = Math.min(a.x, b.x)
+  const maxX = Math.max(a.x, b.x)
+  const minY = Math.min(a.y, b.y)
+  const maxY = Math.max(a.y, b.y)
+  return {
+    dx: Math.min(1 - maxX, Math.max(-minX, dx)),
+    dy: Math.min(1 - maxY, Math.max(-minY, dy)),
+  }
+}
+
 /** Angle of a line from horizontal, in degrees (0–90). */
 export function angleFromHorizontal(a: Point, b: Point): number {
   const deg = Math.abs(toDegrees(Math.atan2(b.y - a.y, b.x - a.x)))

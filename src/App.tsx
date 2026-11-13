@@ -1,6 +1,8 @@
+import { AnnotationToolbar } from './components/AnnotationToolbar'
 import { PlaybackControls } from './components/PlaybackControls'
 import { OpenVideoButton, VideoLoader } from './components/VideoLoader'
 import { VideoPlayer } from './components/VideoPlayer'
+import { useAnnotationShortcuts } from './hooks/useAnnotationShortcuts'
 import { useFileDrop } from './hooks/useFileDrop'
 import { usePlaybackShortcuts } from './hooks/usePlaybackShortcuts'
 import { usePlayback } from './store/playback'
@@ -13,6 +15,7 @@ export default function App() {
 
   const isDragging = useFileDrop(loadFile)
   usePlaybackShortcuts()
+  useAnnotationShortcuts()
 
   return (
     <div className="app">
@@ -35,6 +38,7 @@ export default function App() {
       <main className="app__main">
         {videoUrl ? (
           <>
+            <AnnotationToolbar />
             <VideoPlayer />
             <PlaybackControls />
             {isDragging && <div className="drop-overlay">Drop to replace video</div>}

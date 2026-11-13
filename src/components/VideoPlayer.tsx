@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { usePlayback } from '../store/playback'
+import { OverlayCanvas } from './OverlayCanvas'
 
 const supportsFrameCallback =
   typeof HTMLVideoElement !== 'undefined' &&
@@ -80,6 +81,7 @@ export function VideoPlayer() {
         onEnded={() => setIsPlaying(false)}
         onError={() => setError(UNSUPPORTED_FORMAT)}
       />
+      <OverlayCanvas />
     </div>
   )
 }

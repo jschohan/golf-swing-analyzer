@@ -4,7 +4,7 @@ import { usePlayback } from '../store/playback'
 const LARGE_STEP = 10
 
 /** Whether the key event belongs to a control that needs the keys itself. */
-function isEditingTarget(target: EventTarget | null): boolean {
+export function isEditingTarget(target: EventTarget | null): boolean {
   if (target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) return true
   // Range inputs (the scrubber) are fine: we handle their arrow keys as frame steps.
   return target instanceof HTMLInputElement && target.type !== 'range'
