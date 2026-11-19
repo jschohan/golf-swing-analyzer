@@ -52,24 +52,90 @@ export function lineIntersection(a1: Point, a2: Point, b1: Point, b2: Point): Po
 }
 
 /**
- * Clamps a translation so both endpoints stay inside the unit square.
- * Keeps a line's shape intact when it is dragged against an edge.
+ * Clamps a translation so every point stays inside the unit square.
+ * Keeps a shape intact when it is dragged against an edge.
  */
 export function clampTranslation(
-  a: Point,
-  b: Point,
+  points: Point[],
   dx: number,
   dy: number,
 ): { dx: number; dy: number } {
-  const minX = Math.min(a.x, b.x)
-  const maxX = Math.max(a.x, b.x)
-  const minY = Math.min(a.y, b.y)
-  const maxY = Math.max(a.y, b.y)
+  const xs = points.map((p) => p.x)
+  const ys = points.map((p) => p.y)
   return {
-    dx: Math.min(1 - maxX, Math.max(-minX, dx)),
-    dy: Math.min(1 - maxY, Math.max(-minY, dy)),
+    dx: Math.min(1 - Math.max(...xs), Math.max(-Math.min(...xs), dx)),
+    dy: Math.min(1 - Math.max(...ys), Math.max(-Math.min(...ys), dy)),
   }
 }
+
+export type Size = { width: number; height: number }
+
+/**
+ * Converts a normalized point to pixels. Angles must be measured in pixels:
+ * normalized coordinates stretch a non-square frame into a square, which
+ * changes every angle that isn't axis-aligned.
+ */
+export const toPixels = (p: Point, size: Size): Point => ({
+  x: p.x * size.width,
+  y: p.y * size.height,
+})
+
+export const distance = (a: Point, b: Point) => Math.hypot(b.x - a.x, b.y - a.y)
+
+export type AngleMeasure = {
+  degrees: number
+  /** Where the arms meet, or null for parallel lines. */
+  vertex: Point | null
+  p1: Point
+  p2: Point
+}
+
+/**
+ * Angle between two drawn lines, as they would meet if extended (0–180).
+ * Each arm runs from the intersection toward the line's far endpoint, so the
+ * result is the angle on the side where the lines were actually drawn.
+ */
+export function measureLines(a1: Point, a2: Point, b1: Point, b2: Point): AngleMeasure {
+  const vertex = lineIntersection(a1, a2, b1, b2)
+  if (!vertex) return { degrees: 0, vertex: null, p1: a2, p2: b2 }
+  const p1 = distance(vertex, a1) > distance(vertex, a2) ? a1 : a2
+  const p2 = distance(vertex, b1) > distance(vertex, b2) ? b1 : b2
+  return { degrees: angleAtVertex(vertex, p1, p2), vertex, p1, p2 }
+}
+
+const unit = (from: Point, to: Point): Point => {
+  const len = distance(from, to) || 1
+  return { x: (to.x - from.x) / len, y: (to.y - from.y) / len }
+}
+
+/** Point `dist` away from `vertex` along the bisector of the angle p1–vertex–p2. */
+export function bisectorPoint(vertex: Point, p1: Point, p2: Point, dist: number): Point {
+  const u1 = unit(vertex, p1)
+  const u2 = unit(vertex, p2)
+  let bx = u1.x + u2.x
+  let by = u1.y + u2.y
+  // Arms pointing in opposite directions have no bisector; use a perpendicular.
+  if (Math.hypot(bx, by) < 1e-9) {
+    bx = -u1.y
+    by = u1.x
+  }
+  const len = Math.hypot(bx, by)
+  return { x: vertex.x + (bx / len) * dist, y: vertex.y + (by / len) * dist }
+}
+
+/** SVG path for the arc of the given radius spanning the angle p1–vertex–p2. */
+export function arcPath(vertex: Point, p1: Point, p2: Point, radius: number): string {
+  const u1 = unit(vertex, p1)
+  const u2 = unit(vertex, p2)
+  const start = { x: vertex.x + u1.x * radius, y: vertex.y + u1.y * radius }
+  const end = { x: vertex.x + u2.x * radius, y: vertex.y + u2.y * radius }
+  // With y pointing down, a positive cross product is a clockwise turn on screen.
+  const sweep = u1.x * u2.y - u1.y * u2.x > 0 ? 1 : 0
+  return `M ${start.x} ${start.y} A ${radius} ${radius} 0 0 ${sweep} ${end.x} ${end.y}`
+}
+
+export const formatDegrees = (degrees: number) =>
+  Number.isFinite(degrees) ? `${degrees.toFixed(1)}°` : '–'
 
 /** Angle of a line from horizontal, in degrees (0–90). */
 export function angleFromHorizontal(a: Point, b: Point): number {

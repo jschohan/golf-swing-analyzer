@@ -1,3 +1,4 @@
+import { AnglePanel } from './components/AnglePanel'
 import { AnnotationToolbar } from './components/AnnotationToolbar'
 import { PlaybackControls } from './components/PlaybackControls'
 import { OpenVideoButton, VideoLoader } from './components/VideoLoader'
@@ -41,6 +42,7 @@ export default function App() {
             <AnnotationToolbar />
             <VideoPlayer />
             <PlaybackControls />
+            <AnglePanel />
             {isDragging && <div className="drop-overlay">Drop to replace video</div>}
           </>
         ) : (
